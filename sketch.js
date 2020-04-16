@@ -3,7 +3,6 @@ let strange;
 let vid;
 let capture;
 let stock;
-let img;
 let black;
 let distance;
 let vid1
@@ -14,6 +13,9 @@ let fft
 let sight = true
 
 let play = false
+
+
+
 
 function preload() {
   stock = loadImage('star.jpg');
