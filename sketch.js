@@ -1,20 +1,56 @@
+let time = 0;
+var money;
+
+
 let video;
 let poseNet;
 let pose;
 let skeleton;
-let dataTransform;
+var bubbles = [];
 
-function setup(){
-  createCanvas(640,480)
+function setup() {
+
+  loadData();
+
+  createCanvas(windowWidth,windowHeight, WEBGL);
   video = createCapture(VIDEO)
   video.hide();
   poseNet = ml5.poseNet(video, modelLoaded);
   poseNet.on('pose', gotPoses);
 
+
+}
+
+function Bubble(x, y, z, size, rThresh, col) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.rThresh = rThresh;
+    this.size = size;
+    this.col = col*10;
+    print(col);
+    this.display = function() {
+        strokeWeight(5);
+        stroke(0);
+        fill(this.col*7, this.col*2, this.col*10, col*10);
+        if(this.rThresh>100){
+        rotateY(millis()/10000);
+        rotateX(millis()/10000);
+        rotateZ(millis()/10000);
+      }
+        translate(this.x, 2*this.y-(height/4), this.z-1000);
+        box(size);
+    }
+
+    this.move = function() {
+
+        // this.x = this.x + random(-1, 1);
+        // this.y = this.y + random(-1, 1);
+
+    }
 }
 
 function gotPoses(poses){
-  // console.log(poses)
   if(poses.length>0){
     pose = poses[0].pose;
     skeleton = poses[0].skeleton;
@@ -22,50 +58,43 @@ function gotPoses(poses){
 }
 
 function modelLoaded(){
-  // console.log('poseNet ready')
 }
 
-function draw(){
+function gotData(data) {
+
+  money = data;
+
+}
+
+async function loadData() {
+  loadJSON("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,JPY,EUR&api_key={0a05bf67fef62604017cccdbe627e65648d0084e7ba8d0758a673db71497be8a}", gotData);
+}
+
+function draw() {
+
   translate(video.width,0);
-  scale(-1,1)
+  scale(-1,1);
   background(0)
-  image(video,0,0, width, height);
+
+  time = time + 1;
 
   if(pose){
+    if(money){
+      if(time % 30 == 0){
+         loadData();
+         print(money);
+        }
 
-  // let eyeR = pose.rightEye;
-  // let eyeL = pose.leftEye;
-  // let d = dist(eyeR.x, eyeR.y, eyeL.x, eyeL.y)
+      }
+    for(var i = 0; i < 10; i++){
 
-  // fill(255,0,0)
-  // ellipse(pose.nose.x, pose.nose.y, d)
-  fill(0,0,255)
-  ellipse(pose.rightWrist.x, pose.rightWrist.y, 32)
-  ellipse(pose.leftWrist.x, pose.leftWrist.y,32)
+      bubbles[i] = new Bubble(100,pose.leftWrist.y, pose.rightWrist.y,abs(pose.leftWrist.x-pose.rightWrist.x)*5, abs(pose.leftWrist.y-pose.rightWrist.y), Math.floor((money.USD-money.EUR-555)));
 
-  if(pose.rightWrist.x>pose.leftWrist.x){
-    dataTransform = true
+    }
+       for (var i = 0; i < bubbles.length; i++) {
+        bubbles[i].move();
+        bubbles[i].display();    
+      }
   }
-  if(dataTransform==true){
-    
-  }
 
-  // for(let i = 0; i<pose.keypoints.length; i++){
-  //   let x = pose.keypoints[i].position.x;
-  //   let y = pose.keypoints[i].position.y;
-  //   fill(0,0,0);
-  //   ellipse(x,y,16,16)
-
-  // }
-
-  // for(let i = 0; i<skeleton.length; i++){
-  //   let a = skeleton[i][0];
-  //   let b = skeleton[i][1];
-  //   strokeWeight(2)
-  //   stroke(0)
-  //   line(a.position.x, a.position.y, b.position.x, b.position.y)
-
-  // }
-
-}
 }
