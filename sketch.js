@@ -1,269 +1,71 @@
-let tracker;
-let strange;
-let vid;
-let capture;
-let stock;
-let black;
-let distance;
-let vid1
-let vid2
-let aud
-var mic
-let fft
-let sight = true
+let video;
+let poseNet;
+let pose;
+let skeleton;
+let dataTransform;
 
-let play = false
-
-
-
-
-function preload() {
-  stock = loadImage('star.jpg');
-  vid1 = createVideo('gif2.mp4')
-  vid2 = createVideo('gif4.mp4')
-  vid = createVideo('gif3.mp4')
-  black = loadImage('black.jpg')
-}
-
-function setup() {
-  
-
-
-  mic = new p5.AudioIn();
-  mic.start();
-  fft = new p5.FFT();
-
-  fft.setInput(mic)
-
-
-    vid.hide()
-    vid1.hide()
-    vid2.hide()
-
-    vid1.loop()
-    vid2.loop()
-    vid.loop()
-
-    createCanvas(1600, 1000, WEBGL)
-
-    // aud = createCapture(AUDIO)
-    // aud.hide()
-
-    // graphics = createGraphics(100, 100)
-
-    // start capturing video
-
-    capture = createCapture(VIDEO);
-    capture.size(1600, 1000);
-    // capture.hide();
-
-    // capture1 = createCapture(VIDEO);
-    // capture1.size(1600, 1000);
-    // capture1.hide();
-
-    frameRate(10)
-
-    // create the tracker
-    tracker = new clm.tracker()
-    tracker.init()
-    tracker.start(capture.elt)
-}
-
-
-function draw() {   
-
-  var vol = mic.getLevel();
-
-
-
-
- let positions = tracker.getCurrentPosition()
-
-    if (positions.length > 0) {
-
-
-        stroke(255)
-        fill(255)
-
-        // draw the data
-        let i = 0;
-        while (i < positions.length - 1) {
-            // ellipse(positions[i][0], positions[i][1], 4, 4)
-            // text(i, positions[i][0], positions[i][1])
-            // line(positions[i][0], positions[i][1], positions[i+1][0], positions[i+1][1])
-            // image(vid, positions[i][0]-strange.width/2, positions[i][1]-strange.height/2, 50, 50)
-        
-            i++
-          }
-
-
-        // overlay eyes
-        let leftEyeX = positions[32][0]
-        let leftEyeY = positions[32][1]
-
-        let rightEyeX = positions[27][0]
-        let rightEyeY = positions[27][1]
-        
-
-
-        // push()
-        fill(255, 0, 0)
-        ellipse(leftEyeX, leftEyeY, 20, 20)
-        ellipse(rightEyeX, rightEyeY, 20, 20)
-        // pop() 
-
-
-
-        // measure distances between features
-        let noseX = positions[62][0]
-        let noseY = positions[62][1]
-
-        let leftNostrilX = positions[43][0]
-        let leftNostrilY = positions[43][1]
-
-        let rightNostrilX = positions[42][0]
-        let rightNostrilY = positions[42][1]
-
-        
-        let distance = dist(leftEyeX, leftEyeY, rightEyeX, rightEyeY) 
-        // let distanceRight = dist(noseX, noseY, rightNostrilX, rightNostrilY)
-
-
-
-      // print(stretch)
-   // distance = distboi;
-    let stretch = (2*distance)+800-118
-
-
-    if(stretch<960){
-
-    let rsphere = pow(1.048,distance)
-
-    texture(black)
-    sphere(rsphere,32,24)
-
-    translate(0,0,-distance)
-
-    strokeWeight(0)
- 
-    translate(0,0,distance-100)
-
-    let photonsphere = rsphere*3/2
-
-
-    texture(vid2)
-    // shearX(millis()/10000)
-    // shearY(millis()/1000)
-    // rotateZ(millis()/(vol*1000))
-
-    torus(photonsphere, distance*3,24,16)
-
-
-      translate(0, 0,450)
-      translate(0,0,-350)
-
-      noStroke()
-      texture(vid2)
-
-      ellipsoid(800, 800, stretch, 24, 24)
-
-
-
-    }else{
-
-      print(stretch)
-}}
+function setup(){
+  createCanvas(640,480)
+  video = createCapture(VIDEO)
+  video.hide();
+  poseNet = ml5.poseNet(video, modelLoaded);
+  poseNet.on('pose', gotPoses);
 
 }
 
+function gotPoses(poses){
+  // console.log(poses)
+  if(poses.length>0){
+    pose = poses[0].pose;
+    skeleton = poses[0].skeleton;
+  }
+}
 
+function modelLoaded(){
+  // console.log('poseNet ready')
+}
 
+function draw(){
+  translate(video.width,0);
+  scale(-1,1)
+  background(0)
+  image(video,0,0, width, height);
 
+  if(pose){
 
-function mouseClicked() {
-  if(play == false){
-  vid1.play();
-  vid2.play();
-              vid.play();
-play = true;
+  // let eyeR = pose.rightEye;
+  // let eyeL = pose.leftEye;
+  // let d = dist(eyeR.x, eyeR.y, eyeL.x, eyeL.y)
 
+  // fill(255,0,0)
+  // ellipse(pose.nose.x, pose.nose.y, d)
+  fill(0,0,255)
+  ellipse(pose.rightWrist.x, pose.rightWrist.y, 32)
+  ellipse(pose.leftWrist.x, pose.leftWrist.y,32)
+
+  if(pose.rightWrist.x>pose.leftWrist.x){
+    dataTransform = true
+  }
+  if(dataTransform==true){
+    
   }
 
-}
+  // for(let i = 0; i<pose.keypoints.length; i++){
+  //   let x = pose.keypoints[i].position.x;
+  //   let y = pose.keypoints[i].position.y;
+  //   fill(0,0,0);
+  //   ellipse(x,y,16,16)
 
+  // }
 
+  // for(let i = 0; i<skeleton.length; i++){
+  //   let a = skeleton[i][0];
+  //   let b = skeleton[i][1];
+  //   strokeWeight(2)
+  //   stroke(0)
+  //   line(a.position.x, a.position.y, b.position.x, b.position.y)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function notused(){
-
-
-      // get data from tracker
-    let positions = tracker.getCurrentPosition()
-    if (positions.length > 0) {
-
-        stroke(255)
-        fill(255)
-
-        // draw the data
-        let i = 0;
-        while (i < positions.length - 1) {
-            // ellipse(positions[i][0], positions[i][1], 4, 4)
-            // text(i, positions[i][0], positions[i][1])
-            // line(positions[i][0], positions[i][1], positions[i+1][0], positions[i+1][1])
-            // image(vid, positions[i][0]-strange.width/2, positions[i][1]-strange.height/2, 50, 50)
-        
-            i++
-          }
-
-
-        // overlay eyes
-        let leftEyeX = positions[32][0]
-        let leftEyeY = positions[32][1]
-
-        let rightEyeX = positions[27][0]
-        let rightEyeY = positions[27][1]
-        
-
-
-        // push()
-        // fill(255, 0, 0)
-        // ellipse(leftEyeX, leftEyeY, 20, 20)
-        // ellipse(rightEyeX, rightEyeY, 20, 20)
-        // pop()   
-
-
-
-        // measure distances between features
-        let noseX = positions[62][0]
-        let noseY = positions[62][1]
-
-        let leftNostrilX = positions[43][0]
-        let leftNostrilY = positions[43][1]
-
-        let rightNostrilX = positions[42][0]
-        let rightNostrilY = positions[42][1]
-
-        
-        let distboi = dist(leftEyeX, leftEyeY, rightEyeX, rightEyeY) 
-        // let distanceRight = dist(noseX, noseY, rightNostrilX, rightNostrilY)
+  // }
 
 }
 }
