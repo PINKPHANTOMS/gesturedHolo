@@ -7,6 +7,11 @@ let poseNet;
 let pose;
 let skeleton;
 var bubbles = [];
+let virtualboi;
+
+function preload() {
+  virtualboi = loadModel('virtual.obj');
+}
 
 function setup() {
 
@@ -39,7 +44,7 @@ function Bubble(x, y, z, size, rThresh, col) {
         rotateZ(millis()/10000);
       }
         translate(this.x, 2*this.y-(height/4), this.z-1000);
-        box(size);
+        model(virtualboi);
     }
 
     this.move = function() {
