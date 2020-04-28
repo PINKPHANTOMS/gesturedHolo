@@ -10,17 +10,15 @@ let graphics;
 
 function preload() {
 
-  gif = createVideo('no.mov');
-
-  gif.hide();
-  gif.play();
-  gif.loop();
+  gif = createVideo('no.MOV');
 }
 function setup() {
 
   // loadData();
 
   graphics = createGraphics(1000,1000);
+  gif.hide();
+  gif.loop();
 
 
   createCanvas(windowWidth, windowHeight, WEBGL);
@@ -38,6 +36,10 @@ function Bubble(x, y, z, size, rThresh) {
     this.z = z;
     this.rThresh = rThresh;
     this.size = size;
+    this.textboi = function() {
+
+        graphics.image(gif, 0, 0, 1000, 1000);
+    }
     this.display = function() {
         strokeWeight(5);
         stroke(255);
@@ -49,17 +51,10 @@ function Bubble(x, y, z, size, rThresh) {
         rotateZ(millis()/10000);
       }
         translate(this.x, 5*((this.y)-(height/2)), this.z+1000);
-        graphics.image(gif, 0, 0, 1000, 1000);
         texture(graphics);
         box(size);
     }
 
-    this.move = function() {
-
-        // this.x = this.x + random(-1, 1);
-        // this.y = this.y + random(-1, 1);
-
-    }
 }
 
 function gotPoses(poses){
@@ -80,6 +75,8 @@ function gotPoses(poses){
 // }
 
 function draw() {
+
+
 
   translate(video.width,0);
   scale(-1,1);
@@ -104,7 +101,7 @@ function draw() {
 
     }
        for (var i = 0; i < bubbles.length; i++) {
-        bubbles[i].move();
+        bubbles[i].textboi();
         bubbles[i].display();    
       }
   }
