@@ -17,6 +17,7 @@ function setup() {
   // loadData();
 
   graphics = createGraphics(1000,1000);
+  gif.volume(null);
   gif.hide();
   gif.loop();
 
@@ -36,13 +37,9 @@ function Bubble(x, y, z, size, rThresh) {
     this.z = z;
     this.rThresh = rThresh;
     this.size = size;
-    this.textboi = function() {
-
-        graphics.image(gif, 0, 0, 1000, 1000);
-    }
     this.display = function() {
         strokeWeight(5);
-        stroke(255);
+        stroke(0);
         // fill(0, 0, 0, 0);
         // fill(abs(this.col*7), abs(this.col*2), abs(this.col*10));
         if(this.rThresh>100){
@@ -59,6 +56,8 @@ function Bubble(x, y, z, size, rThresh) {
 
 function gotPoses(poses){
   if(poses.length>0){
+    graphics.image(gif, 0, 0, 1000, 1000);
+
     pose = poses[0].pose;
     skeleton = poses[0].skeleton;
   }
@@ -101,7 +100,7 @@ function draw() {
 
     }
        for (var i = 0; i < bubbles.length; i++) {
-        bubbles[i].textboi();
+        // bubbles[i].textboi();
         bubbles[i].display();    
       }
   }
