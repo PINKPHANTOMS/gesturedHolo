@@ -5,12 +5,25 @@ let poseNet;
 let pose;
 let skeleton;
 var bubbles = [];
+let gif;
+let graphics;
 
+function preload() {
+
+  gif = createVideo('no.mov');
+
+  gif.hide();
+  gif.play();
+  gif.loop();
+}
 function setup() {
 
   // loadData();
 
-  createCanvas(windowWidth,windowHeight, WEBGL);
+  graphics = createGraphics(1000,1000);
+
+
+  createCanvas(windowWidth, windowHeight, WEBGL);
   video = createCapture(VIDEO)
   video.hide();
   poseNet = ml5.poseNet(video);
@@ -28,14 +41,16 @@ function Bubble(x, y, z, size, rThresh) {
     this.display = function() {
         strokeWeight(5);
         stroke(255);
-        fill(0, 0, 0, 0);
+        // fill(0, 0, 0, 0);
         // fill(abs(this.col*7), abs(this.col*2), abs(this.col*10));
         if(this.rThresh>100){
         rotateY(millis()/10000);
         rotateX(millis()/10000);
         rotateZ(millis()/10000);
       }
-        translate(this.x, 2*this.y-(height/4), this.z-1000);
+        translate(this.x, 5*((this.y)-(height/2)), this.z+1000);
+        graphics.image(gif, 0, 0, 1000, 1000);
+        texture(graphics);
         box(size);
     }
 
@@ -80,7 +95,10 @@ function draw() {
     //   //   }
 
     //   }
-    for(var i = 0; i < 10; i++){
+
+    camera(0, 0, -50* 100, 0, 0, 0, 0, 1, 0);
+
+    for(var i = 0; i < 100; i++){
 
       bubbles[i] = new Bubble(100,pose.leftWrist.y, pose.rightWrist.y,abs(pose.leftWrist.x-pose.rightWrist.x)*5, abs(pose.leftWrist.y-pose.rightWrist.y));
 
